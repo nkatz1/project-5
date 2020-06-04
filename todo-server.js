@@ -11,8 +11,8 @@ const port = 8888,
   dbURL = "mongodb://127.0.0.1:27017",
   MongoClient = require("mongodb").MongoClient,
   client = new MongoClient(dbURL),
-  dbName = "commentsDB",
-  collName = "comments";
+  dbName = "todoDB",
+  collName = "todos";
 
 let db,
   col,
@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 });
 
 // endpoint to Get all comments
-app.get("/comments", (req, res) => {
+app.get("/todos", (req, res) => {
   db.collection(collName)
     .find({})
     .toArray(function(err, result) {
@@ -60,14 +60,14 @@ app.get("/comments", (req, res) => {
       //console.log(result);
       res.status(200).send({
         success: "true",
-        message: "comments retrieved successfully",
-        comments: result
+        message: "to do retrieved successfully",
+        todos: result
       });
     });
 });
 
-//endpoint to get a single comment
-app.get("/getcomment/:data", (req, res, next) => {
+//endpoint to get a single ToDo
+app.get("/gettodo/:data", (req, res, next) => {
   const data = req.params.data;
 
   db.collection(collName).findOne(
@@ -79,34 +79,34 @@ app.get("/getcomment/:data", (req, res, next) => {
       console.log(result);
       res.status(200).send({
         status_code: 200,
-        message: result ? result : "comment not found"
+        message: result ? result : "todo not found"
       });
     }
   );
 });
 
-//Endpoint to add a comment
-app.post("/addcomment", (req, res) => {
+//Endpoint to add a ToDo
+app.post("/addtodo", (req, res) => {
   // Insert a single document
-  let comment = {
+  let todo = {
     data: req.body.data
   };
 
   db.collection(collName)
-    .insertOne(comment)
+    .insertOne(todo)
     .then(result => {
       console.log(`record inserted ${result}`);
       return res.status(201).send({
         status_code: 200,
-        message: "Comment added successfully",
-        comment
+        message: "todo added successfully",
+        todo
       });
     })
     .catch(error => console.error(error));
 });
 
-//Endpoint to Delete a single comment
-app.post("/deletecomment/:data", (req, res) => {
+//Endpoint to Delete a single ToDo
+app.post("/deletetodo/:data", (req, res) => {
   const data = req.params.data;
   console.log(data);
   db.collection(collName).deleteOne(
@@ -116,13 +116,13 @@ app.post("/deletecomment/:data", (req, res) => {
     function(err, obj) {
       if (err) throw err;
       //number of documents deleted
-      console.log(obj.result.n + " document(s) deleted");
+      console.log(obj.result.n + " todo(s) deleted");
     }
   );
 
   return res.status(200).send({
     status_code: 200,
-    message: "comment deleted"
+    message: "todo(s) deleted"
   });
 });
 
